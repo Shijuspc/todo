@@ -1,6 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:http/http.dart';
+import 'package:intl/intl.dart';
 
+import 'connect.dart';
 import 'home.dart';
 
 class NewTask extends StatefulWidget {
@@ -11,6 +17,24 @@ class NewTask extends StatefulWidget {
 }
 
 class _NewTaskState extends State<NewTask> {
+  TextEditingController name = TextEditingController();
+  TextEditingController date = TextEditingController();
+  TextEditingController stime = TextEditingController();
+  TextEditingController etime = TextEditingController();
+  TextEditingController des = TextEditingController();
+  Future<void> postData() async {
+    var data = {
+      "name": name.text,
+      "date": date.text,
+      "starttime": stime.text,
+      "endtime": etime.text,
+      "des": des.text,
+    };
+    var resp = await post(Uri.parse('${Con.url}newtask.php'), body: data);
+    var res = jsonDecode(resp.body);
+    print(res);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -78,6 +102,7 @@ class _NewTaskState extends State<NewTask> {
             Padding(
               padding: const EdgeInsets.only(left: 35, right: 35, top: 10),
               child: TextFormField(
+                controller: name,
                 decoration: InputDecoration(
                     border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(5),
@@ -99,6 +124,23 @@ class _NewTaskState extends State<NewTask> {
             Padding(
               padding: const EdgeInsets.only(left: 35, right: 35, top: 10),
               child: TextFormField(
+                controller: date,
+                onTap: () async {
+                  DateTime? datepick = await showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime(2010),
+                      lastDate: DateTime(2025));
+                  if (datepick != null) {
+                    print(datepick);
+                    String formatdate =
+                        DateFormat("yyyy-MM-dd").format(datepick);
+                    print(formatdate);
+                    setState(() {
+                      date.text = formatdate;
+                    });
+                  }
+                },
                 decoration: InputDecoration(
                     suffixIcon: Icon(
                       Icons.calendar_month,
@@ -132,6 +174,22 @@ class _NewTaskState extends State<NewTask> {
                       Padding(
                         padding: const EdgeInsets.only(left: 35, top: 10),
                         child: TextFormField(
+                          controller: stime,
+                          onTap: () async {
+                            TimeOfDay? timepick = await showTimePicker(
+                              context: context,
+                              initialTime: TimeOfDay.now(),
+                              initialEntryMode: TimePickerEntryMode.input,
+                            );
+                            if (timepick != null) {
+                              print(timepick);
+                              String formattedTime = timepick.format(context);
+                              print(formattedTime);
+                              setState(() {
+                                stime.text = formattedTime;
+                              });
+                            }
+                          },
                           decoration: InputDecoration(
                               contentPadding: EdgeInsets.only(
                                 left: 10,
@@ -170,6 +228,22 @@ class _NewTaskState extends State<NewTask> {
                         padding:
                             const EdgeInsets.only(left: 10, right: 35, top: 10),
                         child: TextFormField(
+                          controller: etime,
+                          onTap: () async {
+                            TimeOfDay? timepick = await showTimePicker(
+                              context: context,
+                              initialTime: TimeOfDay.now(),
+                              initialEntryMode: TimePickerEntryMode.input,
+                            );
+                            if (timepick != null) {
+                              print(timepick);
+                              String formattedTime = timepick.format(context);
+                              print(formattedTime);
+                              setState(() {
+                                etime.text = formattedTime;
+                              });
+                            }
+                          },
                           decoration: InputDecoration(
                               contentPadding: EdgeInsets.only(
                                 left: 10,
@@ -213,6 +287,7 @@ class _NewTaskState extends State<NewTask> {
                       height: 200,
                       width: 320,
                       child: TextFormField(
+                        controller: des,
                         maxLines: null,
                         expands: true,
                         keyboardType: TextInputType.multiline,
@@ -236,7 +311,9 @@ class _NewTaskState extends State<NewTask> {
               child: Padding(
                 padding: const EdgeInsets.only(top: 140, bottom: 0),
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    postData();
+                  },
                   style: ElevatedButton.styleFrom(
                       backgroundColor: Color.fromRGBO(0, 112, 173, 1),
                       padding: EdgeInsets.zero,

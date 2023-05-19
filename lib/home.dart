@@ -1,10 +1,15 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:http/http.dart';
 import 'package:todo/calender.dart';
 import 'package:todo/mytask.dart';
 import 'package:todo/newtask.dart';
 import 'package:todo/notification.dart';
 import 'package:todo/profile.dart';
+
+import 'connect.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -14,14 +19,13 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  final List taskList = List.generate(10, (index) {
-    return {
-      "id": "",
-      "title": "UI Design ",
-      "subtitle": "10.00 AM",
-      "subtitle1": "- 12.00 PM",
-    };
-  });
+  Future<dynamic> getData() async {
+    var response = await get(Uri.parse('${Con.url}home.php'));
+    var res = jsonDecode(response.body);
+    print(res);
+    return res;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -58,60 +62,77 @@ class _HomeState extends State<Home> {
       ),
       body: Padding(
         padding: const EdgeInsets.only(left: 15, right: 15),
-        child: ListView.builder(
-          itemCount: taskList.length,
-          itemBuilder: (context, index) => Card(
-            elevation: 1,
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(5),
-                border: Border.all(
-                  color: Color.fromRGBO(1, 166, 255, 1),
-                  width: 1,
-                ),
-              ),
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => Mytask(),
-                      ));
+        child: FutureBuilder(
+          future: getData(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return ListView.builder(
+                itemCount: snapshot.data.length,
+                itemBuilder: (context, index) {
+                  return Card(
+                    elevation: 1,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5),
+                        border: Border.all(
+                          color: Color.fromRGBO(1, 166, 255, 1),
+                          width: 1,
+                        ),
+                      ),
+                      child: ListTile(
+                        leading: CircleAvatar(
+                          backgroundColor: Color.fromRGBO(255, 255, 255, 1),
+                          child: Icon(
+                            Icons.account_circle_rounded,
+                          ),
+                        ),
+                        title: Text(snapshot.data![index]['name'],
+                            style: TextStyle(
+                                color: Color.fromRGBO(0, 112, 173, 1),
+                                fontWeight: FontWeight.w600)),
+                        subtitle: Padding(
+                          padding: const EdgeInsets.only(top: 2),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Text(
+                                snapshot.data![index]['starttime'],
+                              ),
+                              SizedBox(
+                                width: 5,
+                              ),
+                              Text(snapshot.data![index]['endtime']),
+                            ],
+                          ),
+                        ),
+                        trailing: IconButton(
+                          onPressed: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => Mytask(),
+                                ));
+                          },
+                          icon: Icon(
+                            Icons.arrow_forward_ios_rounded,
+                            color: Color.fromRGBO(0, 112, 173, 1),
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
                 },
-                child: ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: Color.fromRGBO(255, 255, 255, 1),
-                    child: Icon(
-                      Icons.account_circle_rounded,
-                    ),
-                  ),
-                  title: Text(taskList[index]["title"],
-                      style: TextStyle(
-                          color: Color.fromRGBO(0, 112, 173, 1),
-                          fontWeight: FontWeight.w600)),
-                  subtitle: Padding(
-                    padding: const EdgeInsets.only(top: 2),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Text(
-                          taskList[index]["subtitle"],
-                        ),
-                        SizedBox(
-                          width: 5,
-                        ),
-                        Text(taskList[index]["subtitle1"]),
-                      ],
-                    ),
-                  ),
-                  trailing: const Icon(
-                    Icons.arrow_forward_ios_rounded,
-                    color: Color.fromRGBO(0, 112, 173, 1),
-                  ),
-                ),
-              ),
-            ),
-          ),
+              );
+            } else if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            } else {
+              return Center(
+                child: Text('No Notification'),
+              );
+            }
+          },
         ),
       ),
       floatingActionButton: FloatingActionButton(
