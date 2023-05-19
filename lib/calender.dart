@@ -55,7 +55,7 @@ class _CalenderState extends State<Calender> {
           margin: EdgeInsets.only(left: 8, top: 6, bottom: 6, right: 8),
           decoration: BoxDecoration(
             color: Color.fromRGBO(229, 246, 247, 1.000),
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(11),
           ),
           child: IconButton(
             onPressed: () {
