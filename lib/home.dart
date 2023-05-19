@@ -98,8 +98,11 @@ class _HomeState extends State<Home> {
                               Text(
                                 snapshot.data![index]['starttime'],
                               ),
-                              SizedBox(
-                                width: 5,
+                              Container(
+                                height: 1,
+                                width: 6,
+                                margin: EdgeInsets.only(left: 5, right: 5),
+                                color: Colors.black,
                               ),
                               Text(snapshot.data![index]['endtime']),
                             ],

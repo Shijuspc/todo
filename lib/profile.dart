@@ -1,5 +1,10 @@
-import 'package:flutter/material.dart';
+import 'dart:convert';
 
+import 'package:flutter/material.dart';
+import 'package:http/http.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'connect.dart';
 import 'home.dart';
 
 class Profile extends StatefulWidget {
@@ -10,6 +15,17 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
+  Future<dynamic> getData() async {
+    SharedPreferences spref = await SharedPreferences.getInstance();
+    var sp = spref.getString("log_id");
+    var data = {'id': sp};
+    print(data);
+    var response = await post(Uri.parse('${Con.url}profile.php'), body: data);
+    var res = jsonDecode(response.body);
+    print(res);
+    return res;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -82,15 +98,11 @@ class _ProfileState extends State<Profile> {
             SizedBox(height: 8),
             ListTile(
               leading: Icon(Icons.email),
-              title: Text('john.doe@example.com'),
+              title: Text('shiju@gmail.com'),
             ),
             ListTile(
               leading: Icon(Icons.phone),
-              title: Text('(123) 456-7890'),
-            ),
-            ListTile(
-              leading: Icon(Icons.location_on),
-              title: Text('New York, USA'),
+              title: Text('123456789'),
             ),
           ],
         ),

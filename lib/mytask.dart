@@ -1,9 +1,14 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:http/http.dart';
 import 'package:todo/edittask.dart';
 import 'package:todo/profile.dart';
 
 import 'calender.dart';
+import 'connect.dart';
 import 'home.dart';
 import 'notification.dart';
 
@@ -15,14 +20,29 @@ class Mytask extends StatefulWidget {
 }
 
 class _MytaskState extends State<Mytask> {
-  final List taskList = List.generate(15, (index) {
-    return {
-      "id": "",
-      "title": "UI Design ",
-      "subtitle": "10.00 AM",
-      "subtitle1": "- 12.00 PM",
+  Future<dynamic> getTask() async {
+    var response = await get(Uri.parse('${Con.url}mytask.php'));
+    var res = jsonDecode(response.body);
+    print(res);
+    return res;
+  }
+
+  Future<void> deleteTask(String taskId) async {
+    var data = {
+      "task_id": taskId,
     };
-  });
+
+    var response =
+        await post(Uri.parse('${Con.url}deletetask.php'), body: data);
+    var res = jsonDecode(response.body);
+
+    if (res['message'] == 'Form Data') {
+      Fluttertoast.showToast(msg: 'Deleted Task');
+    } else {
+      Fluttertoast.showToast(msg: 'Delete Failed');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -75,70 +95,85 @@ class _MytaskState extends State<Mytask> {
       ),
       body: Padding(
         padding: const EdgeInsets.only(left: 15, right: 15),
-        child: ListView.builder(
-          itemCount: taskList.length,
-          itemBuilder: (context, index) => Card(
-            elevation: 1,
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(5),
-                border: Border.all(
-                  color: Color.fromRGBO(1, 166, 255, 1),
-                  width: 1,
-                ),
-              ),
-              child: ListTile(
-                leading: CircleAvatar(
-                  backgroundColor: Color.fromRGBO(255, 255, 255, 1),
-                  child: Icon(
-                    Icons.account_circle_rounded,
-                  ),
-                ),
-                title: Text(taskList[index]["title"],
-                    style: TextStyle(
-                        color: Color.fromRGBO(0, 112, 173, 1),
-                        fontWeight: FontWeight.w600)),
-                subtitle: Padding(
-                  padding: const EdgeInsets.only(top: 2),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Text(
-                        taskList[index]["subtitle"],
+        child: FutureBuilder(
+          future: getTask(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return ListView.builder(
+                itemCount: snapshot.data.length,
+                itemBuilder: (context, index) {
+                  return Card(
+                    elevation: 1,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5),
+                        border: Border.all(
+                          color: Color.fromRGBO(1, 166, 255, 1),
+                          width: 1,
+                        ),
                       ),
-                      SizedBox(
-                        width: 5,
+                      child: ListTile(
+                        leading: CircleAvatar(
+                          backgroundColor: Color.fromRGBO(255, 255, 255, 1),
+                          child: Icon(
+                            Icons.account_circle_rounded,
+                          ),
+                        ),
+                        title: Text(snapshot.data![index]['name'],
+                            style: TextStyle(
+                                color: Color.fromRGBO(0, 112, 173, 1),
+                                fontWeight: FontWeight.w600)),
+                        subtitle: Padding(
+                          padding: const EdgeInsets.only(top: 2),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Text(snapshot.data![index]['starttime']),
+                              SizedBox(
+                                width: 5,
+                              ),
+                              Text(snapshot.data![index]['endtime']),
+                            ],
+                          ),
+                        ),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                                onPressed: () {
+                                  Navigator.push(context, MaterialPageRoute(
+                                    builder: (context) {
+                                      return EditTask(
+                                        id: snapshot.data![index]['task_id'],
+                                      );
+                                    },
+                                  ));
+                                },
+                                icon: const Icon(
+                                  Icons.edit,
+                                  color: Color.fromRGBO(0, 112, 173, 1),
+                                )),
+                            IconButton(
+                                onPressed: () {
+                                  deleteTask(snapshot.data![index]['task_id']);
+                                },
+                                icon: const Icon(
+                                  Icons.delete,
+                                  color: Color.fromRGBO(0, 112, 173, 1),
+                                )),
+                          ],
+                        ),
                       ),
-                      Text(taskList[index]["subtitle1"]),
-                    ],
-                  ),
-                ),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(
-                        onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => EditTask(),
-                              ));
-                        },
-                        icon: const Icon(
-                          Icons.edit,
-                          color: Color.fromRGBO(0, 112, 173, 1),
-                        )),
-                    IconButton(
-                        onPressed: () {},
-                        icon: const Icon(
-                          Icons.delete,
-                          color: Color.fromRGBO(0, 112, 173, 1),
-                        )),
-                  ],
-                ),
-              ),
-            ),
-          ),
+                    ),
+                  );
+                },
+              );
+            } else {
+              return Center(
+                child: Text('No Task'),
+              );
+            }
+          },
         ),
       ),
       floatingActionButton: FloatingActionButton(

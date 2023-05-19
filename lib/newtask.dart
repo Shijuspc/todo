@@ -33,6 +33,11 @@ class _NewTaskState extends State<NewTask> {
     var resp = await post(Uri.parse('${Con.url}newtask.php'), body: data);
     var res = jsonDecode(resp.body);
     print(res);
+    if (res['message'] == 'Form Data') {
+      Fluttertoast.showToast(msg: 'Created Task');
+    } else {
+      Fluttertoast.showToast(msg: 'Task Failed');
+    }
   }
 
   @override
@@ -113,7 +118,7 @@ class _NewTaskState extends State<NewTask> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.only(left: 25, top: 40),
+              padding: const EdgeInsets.only(left: 25, top: 20),
               child: Text(
                 'Date & Time',
                 style: TextStyle(
@@ -163,7 +168,7 @@ class _NewTaskState extends State<NewTask> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Padding(
-                        padding: const EdgeInsets.only(left: 25, top: 40),
+                        padding: const EdgeInsets.only(left: 25, top: 20),
                         child: Text(
                           'Start Time',
                           style: TextStyle(
@@ -216,7 +221,7 @@ class _NewTaskState extends State<NewTask> {
                     children: [
                       Padding(
                         padding:
-                            const EdgeInsets.only(left: 0, right: 25, top: 40),
+                            const EdgeInsets.only(left: 0, right: 25, top: 20),
                         child: Text(
                           'End Time',
                           style: TextStyle(
@@ -270,7 +275,7 @@ class _NewTaskState extends State<NewTask> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.only(left: 25, top: 40),
+                    padding: const EdgeInsets.only(left: 25, top: 20),
                     child: Text(
                       'Description',
                       style: TextStyle(
@@ -279,13 +284,11 @@ class _NewTaskState extends State<NewTask> {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(
-                      left: 35,
-                      top: 10,
-                    ),
+                    padding:
+                        const EdgeInsets.only(left: 35, top: 10, right: 35),
                     child: SizedBox(
                       height: 200,
-                      width: 320,
+                      width: 300,
                       child: TextFormField(
                         controller: des,
                         maxLines: null,
@@ -309,7 +312,7 @@ class _NewTaskState extends State<NewTask> {
             ),
             Center(
               child: Padding(
-                padding: const EdgeInsets.only(top: 140, bottom: 0),
+                padding: const EdgeInsets.only(top: 60, bottom: 0),
                 child: ElevatedButton(
                   onPressed: () {
                     postData();

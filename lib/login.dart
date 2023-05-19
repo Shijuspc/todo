@@ -6,6 +6,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:todo/home.dart';
+import 'package:todo/signup.dart';
 
 import 'connect.dart';
 
@@ -30,7 +31,7 @@ class _LoginState extends State<Login> {
 
   Future<void> postData() async {
     var data = {
-      "username": email.text,
+      "email": email.text,
       "password": password.text,
     };
     var response = await post(Uri.parse('${Con.url}login.php'), body: data);
@@ -69,98 +70,100 @@ class _LoginState extends State<Login> {
                 child: Container(
                   padding: EdgeInsets.only(top: 140),
                   color: Color.fromRGBO(229, 246, 247, 1.000),
-                  height: 520,
-                  width: 380,
-                  child: Column(
-                    children: [
-                      Text(
-                        "TODO",
-                        style: TextStyle(
-                            fontSize: 40,
-                            color: Color.fromRGBO(0, 112, 173, 1),
-                            fontWeight: FontWeight.bold,
-                            fontStyle: FontStyle.italic),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(
-                            left: 15.0, right: 15.0, top: 100, bottom: 0),
-                        child: TextFormField(
-                          controller: email,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return "Enter your Email";
-                            }
-                            if (!value.contains("@")) {
-                              return "Enter Valid Email";
-                            }
-                            return null;
-                          },
-                          decoration: InputDecoration(
-                              hintText: "Email",
-                              contentPadding: EdgeInsets.only(left: 30),
+                  height: 500,
+                  width: 360,
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        Text(
+                          "TODO",
+                          style: TextStyle(
+                              fontSize: 40,
+                              color: Color.fromRGBO(0, 112, 173, 1),
+                              fontWeight: FontWeight.bold,
+                              fontStyle: FontStyle.italic),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(
+                              left: 15.0, right: 15.0, top: 100, bottom: 0),
+                          child: TextFormField(
+                            controller: email,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return "Enter your Email";
+                              }
+                              if (!value.contains("@")) {
+                                return "Enter Valid Email";
+                              }
+                              return null;
+                            },
+                            decoration: InputDecoration(
+                                hintText: "Email",
+                                contentPadding: EdgeInsets.only(left: 30),
+                                filled: true,
+                                fillColor: Colors.white,
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(5),
+                                  borderSide: BorderSide.none,
+                                )),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(
+                              left: 15.0, right: 15.0, top: 10, bottom: 0),
+                          child: TextFormField(
+                            controller: password,
+                            obscureText: passwordVisible,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return "Enter your Password";
+                              } else if (value.length < 6) {
+                                return "atleast 6 characters";
+                              }
+                              return null;
+                            },
+                            decoration: InputDecoration(
+                              hintText: "Password",
+                              contentPadding:
+                                  EdgeInsets.only(left: 30, right: 30),
                               filled: true,
                               fillColor: Colors.white,
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(5),
                                 borderSide: BorderSide.none,
-                              )),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(
-                            left: 15.0, right: 15.0, top: 10, bottom: 0),
-                        child: TextFormField(
-                          controller: password,
-                          obscureText: passwordVisible,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return "Enter your Password";
-                            } else if (value.length < 6) {
-                              return "atleast 6 characters";
-                            }
-                            return null;
-                          },
-                          decoration: InputDecoration(
-                            hintText: "Password",
-                            contentPadding:
-                                EdgeInsets.only(left: 30, right: 30),
-                            filled: true,
-                            fillColor: Colors.white,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(5),
-                              borderSide: BorderSide.none,
-                            ),
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                passwordVisible
-                                    ? Icons.visibility
-                                    : Icons.visibility_off,
-                                color: Color.fromRGBO(0, 112, 173, 1),
                               ),
-                              onPressed: () {
-                                setState(
-                                  () {
-                                    passwordVisible = !passwordVisible;
-                                  },
-                                );
-                              },
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  passwordVisible
+                                      ? Icons.visibility
+                                      : Icons.visibility_off,
+                                  color: Color.fromRGBO(0, 112, 173, 1),
+                                ),
+                                onPressed: () {
+                                  setState(
+                                    () {
+                                      passwordVisible = !passwordVisible;
+                                    },
+                                  );
+                                },
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 30),
-                        child: TextButton(
-                          onPressed: () {},
-                          child: Text(
-                            'Lost Password?',
-                            style: TextStyle(
-                                color: Color.fromRGBO(0, 112, 173, 1),
-                                fontSize: 13),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 10),
+                          child: TextButton(
+                            onPressed: () {},
+                            child: Text(
+                              'Lost Password?',
+                              style: TextStyle(
+                                  color: Color.fromRGBO(0, 112, 173, 1),
+                                  fontSize: 13),
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -178,7 +181,7 @@ class _LoginState extends State<Login> {
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(5))),
                   child: Container(
-                    width: 380,
+                    width: 360,
                     height: 40,
                     alignment: Alignment.center,
                     child: const Text(
@@ -233,7 +236,13 @@ class _LoginState extends State<Login> {
                 children: [
                   Text("Don't have an account?"),
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Signup(),
+                          ));
+                    },
                     child: Text(
                       'Sign up',
                       style: TextStyle(

@@ -1,15 +1,75 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:intl/intl.dart';
 import 'package:todo/mytask.dart';
+import 'package:http/http.dart';
+
+import 'connect.dart';
 
 class EditTask extends StatefulWidget {
-  const EditTask({super.key});
+  String? id;
+  EditTask({Key? key, required this.id}) : super(key: key);
 
   @override
   State<EditTask> createState() => _EditTaskState();
 }
 
 class _EditTaskState extends State<EditTask> {
+  TextEditingController name = TextEditingController();
+  TextEditingController date = TextEditingController();
+  TextEditingController stime = TextEditingController();
+  TextEditingController etime = TextEditingController();
+  TextEditingController des = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
+  Future<void> fetchData() async {
+    var data = {
+      "id": widget.id,
+    };
+
+    var response = await post(Uri.parse('${Con.url}edittask.php'), body: data);
+    var res = jsonDecode(response.body);
+
+    if (res.isNotEmpty) {
+      setState(() {
+        name.text = res[0]['name'];
+        date.text = res[0]['date'];
+        stime.text = res[0]['starttime'];
+        etime.text = res[0]['endtime'];
+        des.text = res[0]['des'];
+      });
+    }
+  }
+
+  Future<void> updateTask() async {
+    var data = {
+      "id": widget.id,
+      "name": name.text,
+      "date": date.text,
+      "starttime": stime.text,
+      "endtime": etime.text,
+      "des": des.text,
+    };
+
+    var response =
+        await post(Uri.parse('${Con.url}updatetask.php'), body: data);
+    var res = jsonDecode(response.body);
+
+    if (res['message'] == 'success') {
+      Fluttertoast.showToast(msg: 'Task Updated');
+    } else {
+      Fluttertoast.showToast(msg: 'Update Failed');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -77,6 +137,7 @@ class _EditTaskState extends State<EditTask> {
             Padding(
               padding: const EdgeInsets.only(left: 35, right: 35, top: 10),
               child: TextFormField(
+                controller: name,
                 decoration: InputDecoration(
                     border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(5),
@@ -87,7 +148,7 @@ class _EditTaskState extends State<EditTask> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.only(left: 25, top: 40),
+              padding: const EdgeInsets.only(left: 25, top: 20),
               child: Text(
                 'Date & Time',
                 style: TextStyle(
@@ -98,6 +159,23 @@ class _EditTaskState extends State<EditTask> {
             Padding(
               padding: const EdgeInsets.only(left: 35, right: 35, top: 10),
               child: TextFormField(
+                controller: date,
+                onTap: () async {
+                  DateTime? datepick = await showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime(2010),
+                      lastDate: DateTime(2025));
+                  if (datepick != null) {
+                    print(datepick);
+                    String formatdate =
+                        DateFormat("yyyy-MM-dd").format(datepick);
+                    print(formatdate);
+                    setState(() {
+                      date.text = formatdate;
+                    });
+                  }
+                },
                 decoration: InputDecoration(
                     suffixIcon: Icon(
                       Icons.calendar_month,
@@ -120,7 +198,7 @@ class _EditTaskState extends State<EditTask> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Padding(
-                        padding: const EdgeInsets.only(left: 25, top: 40),
+                        padding: const EdgeInsets.only(left: 25, top: 20),
                         child: Text(
                           'Start Time',
                           style: TextStyle(
@@ -131,6 +209,22 @@ class _EditTaskState extends State<EditTask> {
                       Padding(
                         padding: const EdgeInsets.only(left: 35, top: 10),
                         child: TextFormField(
+                          controller: stime,
+                          onTap: () async {
+                            TimeOfDay? timepick = await showTimePicker(
+                              context: context,
+                              initialTime: TimeOfDay.now(),
+                              initialEntryMode: TimePickerEntryMode.input,
+                            );
+                            if (timepick != null) {
+                              print(timepick);
+                              String formattedTime = timepick.format(context);
+                              print(formattedTime);
+                              setState(() {
+                                stime.text = formattedTime;
+                              });
+                            }
+                          },
                           decoration: InputDecoration(
                               contentPadding: EdgeInsets.only(
                                 left: 10,
@@ -157,11 +251,11 @@ class _EditTaskState extends State<EditTask> {
                     children: [
                       Padding(
                         padding:
-                            const EdgeInsets.only(left: 0, right: 25, top: 40),
+                            const EdgeInsets.only(left: 0, right: 25, top: 20),
                         child: Text(
                           'End Time',
                           style: TextStyle(
-                              color: Color.fromRGBO(0, 71, 109, 1.000),
+                              color: Color.fromRGBO(0, 112, 173, 1),
                               fontWeight: FontWeight.w600),
                         ),
                       ),
@@ -169,6 +263,22 @@ class _EditTaskState extends State<EditTask> {
                         padding:
                             const EdgeInsets.only(left: 10, right: 35, top: 10),
                         child: TextFormField(
+                          controller: etime,
+                          onTap: () async {
+                            TimeOfDay? timepick = await showTimePicker(
+                              context: context,
+                              initialTime: TimeOfDay.now(),
+                              initialEntryMode: TimePickerEntryMode.input,
+                            );
+                            if (timepick != null) {
+                              print(timepick);
+                              String formattedTime = timepick.format(context);
+                              print(formattedTime);
+                              setState(() {
+                                etime.text = formattedTime;
+                              });
+                            }
+                          },
                           decoration: InputDecoration(
                               contentPadding: EdgeInsets.only(
                                 left: 10,
@@ -195,7 +305,7 @@ class _EditTaskState extends State<EditTask> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.only(left: 25, top: 40),
+                    padding: const EdgeInsets.only(left: 25, top: 20),
                     child: Text(
                       'Description',
                       style: TextStyle(
@@ -204,14 +314,13 @@ class _EditTaskState extends State<EditTask> {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(
-                      left: 35,
-                      top: 10,
-                    ),
+                    padding:
+                        const EdgeInsets.only(left: 35, top: 10, right: 35),
                     child: SizedBox(
                       height: 200,
-                      width: 320,
+                      width: 300,
                       child: TextFormField(
+                        controller: des,
                         maxLines: null,
                         expands: true,
                         keyboardType: TextInputType.multiline,
@@ -233,9 +342,9 @@ class _EditTaskState extends State<EditTask> {
             ),
             Center(
               child: Padding(
-                padding: const EdgeInsets.only(top: 140, bottom: 0),
+                padding: const EdgeInsets.only(top: 60, bottom: 0),
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: updateTask,
                   style: ElevatedButton.styleFrom(
                       backgroundColor: Color.fromRGBO(0, 112, 173, 1),
                       padding: EdgeInsets.zero,
@@ -246,7 +355,7 @@ class _EditTaskState extends State<EditTask> {
                     height: 40,
                     alignment: Alignment.center,
                     child: const Text(
-                      'Edit Done',
+                      'Create Task',
                       style: TextStyle(
                         fontSize: 17,
                       ),

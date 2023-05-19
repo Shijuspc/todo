@@ -62,10 +62,10 @@ class _SignupState extends State<Signup> {
               SizedBox(height: 35),
               Center(
                 child: Container(
-                  padding: EdgeInsets.only(top: 140),
+                  padding: EdgeInsets.only(top: 120),
                   color: Color.fromRGBO(229, 246, 247, 1.000),
-                  height: 520,
-                  width: 380,
+                  height: 500,
+                  width: 360,
                   child: SingleChildScrollView(
                     child: Column(
                       children: [
@@ -206,7 +206,7 @@ class _SignupState extends State<Signup> {
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(5))),
                   child: Container(
-                    width: 380,
+                    width: 360,
                     height: 40,
                     alignment: Alignment.center,
                     child: const Text(
