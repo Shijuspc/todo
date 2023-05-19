@@ -102,7 +102,7 @@ class _HomeState extends State<Home> {
                                 height: 1,
                                 width: 6,
                                 margin: EdgeInsets.only(left: 5, right: 5),
-                                color: Colors.black,
+                                color: Color.fromARGB(255, 89, 89, 89),
                               ),
                               Text(snapshot.data![index]['endtime']),
                             ],

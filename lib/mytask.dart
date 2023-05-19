@@ -129,8 +129,11 @@ class _MytaskState extends State<Mytask> {
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               Text(snapshot.data![index]['starttime']),
-                              SizedBox(
-                                width: 5,
+                              Container(
+                                height: 1,
+                                width: 6,
+                                margin: EdgeInsets.only(left: 5, right: 5),
+                                color: Color.fromARGB(255, 89, 89, 89),
                               ),
                               Text(snapshot.data![index]['endtime']),
                             ],
